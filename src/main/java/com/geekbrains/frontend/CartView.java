@@ -3,6 +3,7 @@ package com.geekbrains.frontend;
 import com.geekbrains.entities.OrderItem;
 import com.geekbrains.services.CartService;
 import com.geekbrains.services.OrderService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
@@ -38,10 +39,8 @@ public class CartView extends AbstractView {
             });
 
             Button minusButton = new Button("-", i -> {
-                if(item.getQuantity() > 0) {
-                    item.decrement();
-                    grid.setItems(cartService.getItems());
-                }
+                item.decrement();
+                grid.setItems(cartService.getItems());
             });
 
             return new HorizontalLayout(plusButton, minusButton);
@@ -52,13 +51,13 @@ public class CartView extends AbstractView {
 
         Button toOrderButton = new Button("Создать заказ", e -> {
             cartService.setAddress(addressField.getValue());
-            if (phoneField.getValue().matches("\\d{11}")) {
-                cartService.setPhone(phoneField.getValue());
-                orderService.saveOrder();
-                Notification.show("Заказ успешно сохранён и передан менеджеру");
-            } else {
-                Notification.show("Номер телефона должен содержать только цыфры!");
-            }
+            cartService.setPhone(phoneField.getValue());
+            orderService.saveOrder();
+
+            cartService.clear();
+            UI.getCurrent().navigate("market");
+
+            Notification.show("Заказ успешно сохранён и передан менеджеру");
         });
 
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
